@@ -1,51 +1,56 @@
 import React, { Component } from "react";
 import ImageGallery from "./imageGallery/ImageGallery";
 import Searchbar from "./searchbar/Searchbar";
-import Loader from "react-loader-spinner";
+import Spiner from "./spiner/Spiner";
+
 import BtnLoadMore from "./btnLoadMore/BtnLoadMore";
-// import imageApi from "../services/imageApi";
+import imageApi from "../services/imageApi";
 
 import "./App.css";
 
 class App extends Component {
   state = {
+    search: "",
     ApiResponse: [],
     page: 1,
     loading: false,
+    // isOpenModal: false,
+    // modalUrl: "",
   };
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevState.search !== this.state.search) this.getImg();
-  // }
+  componentDidUpdate(prevProps, prevState) {
+    const { search, page, ApiResponse } = this.state;
+    if (prevState.search !== search) {
+      this.getImg();
+      return;
+    }
+    if (prevState.search !== search && ApiResponse.length !== 0) {
+      this.resetState();
+      return;
+    }
+    if (prevState.page !== page) this.getImg();
+  }
+  updateSearchValue = (value) => {
+    this.setState({ search: value });
+  };
 
-  // setSearch = (inputValue) => {
-  //   this.setState({ search: inputValue, page: 1, ApiResponse: [] });
-  // };
+  getImg = () => {
+    const { search, page } = this.state;
+    this.isLoading(true);
 
-  // getImg = () => {
-  //   const { search, page } = this.state;
-
-  //   this.setState({ loading: true });
-  //   imageApi
-  //     .feachImgQuery(search, page)
-  //     .then((response) => {
-  //       this.setState((prevState) => ({
-  //         ApiResponse: [...prevState.ApiResponse, ...response],
-  //       }));
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     })
-  //     .finally(() => {
-  //       this.setState({ loading: false });
-  //     });
-  // };
-
-  updateStateApp = (ApiResponse) => {
-    console.log(ApiResponse);
-    this.setState((prevState) => ({
-      ApiResponse: [...prevState.ApiResponse, ...ApiResponse],
-    }));
+    imageApi
+      .feachImgQuery(search, page)
+      .then((response) => {
+        this.setState((prevState) => ({
+          ApiResponse: [...prevState.ApiResponse, ...response],
+        }));
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        this.isLoading(false);
+      });
   };
 
   isLoading = (togle) => {
@@ -56,23 +61,19 @@ class App extends Component {
     this.setState((prevState) => ({ page: prevState.page + 1 }));
   };
 
-  resetState = () => {
+  resetState = async () => {
     this.setState({ page: 1, ApiResponse: [] });
   };
 
   render() {
-    const { ApiResponse, loading, page } = this.state;
+    const { ApiResponse, loading } = this.state;
 
     return (
       <div>
-        <Searchbar
-          updateStateApp={this.updateStateApp}
-          isLoading={this.isLoading}
-          resetState={this.resetState}
-          page={page}
-        />
+        <Searchbar updateSearchValue={this.updateSearchValue} />
+        {loading && <Spiner />}
+
         {ApiResponse.length !== 0 && <ImageGallery ApiResponse={ApiResponse} />}
-        {loading && <Loader />}
         {ApiResponse.length > 0 && (
           <BtnLoadMore handleLoadMore={this.handleLoadMore} />
         )}

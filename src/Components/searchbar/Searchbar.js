@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import imageApi from "../../services/imageApi";
 
 class Searchbar extends Component {
   state = {
@@ -8,39 +7,17 @@ class Searchbar extends Component {
     ApiResponse: [],
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    const { updateStateApp, resetState } = this.props;
-    const { ApiResponse } = this.state;
-    if (prevState.value !== this.state.value) resetState();
-    if (prevProps.page !== this.props.page) this.getImg();
-    if (prevState.ApiResponse !== this.state.ApiResponse)
-      updateStateApp(ApiResponse);
-  }
-
   handleChangeInput = (e) => {
     this.setState({ value: e.target.value });
   };
 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.getImg();
-  };
-
-  getImg = () => {
+    const { updateSearchValue } = this.props;
     const { value } = this.state;
-    const { isLoading, page } = this.props;
-    isLoading(true);
-    imageApi
-      .feachImgQuery(value, page)
-      .then((response) => {
-        this.setState({ ApiResponse: [...response] });
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        isLoading(false);
-      });
+
+    // this.getImg();
+    updateSearchValue(value);
   };
 
   render() {

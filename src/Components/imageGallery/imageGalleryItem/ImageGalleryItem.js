@@ -1,6 +1,7 @@
 import React from "react";
+import keydown from "react-keydown";
 
-const ImageGalleryItem = ({ ApiResponse }) => {
+const ImageGalleryItem = ({ ApiResponse, openModal }) => {
   // console.log(ApiResponse);
   return ApiResponse.map((item) => {
     // console.log(item.webformatURL);
@@ -9,6 +10,8 @@ const ImageGalleryItem = ({ ApiResponse }) => {
         <img
           src={item.webformatURL}
           alt={item.webformatURL}
+          onClick={openModal}
+          data-large={item.largeImageURL}
           className="ImageGalleryItem-image"
         />
       </li>
