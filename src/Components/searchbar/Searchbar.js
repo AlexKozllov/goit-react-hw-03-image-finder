@@ -1,21 +1,46 @@
 import React, { Component } from "react";
+import imageApi from "../../services/imageApi";
 
 class Searchbar extends Component {
-  state = { value: "" };
+  state = {
+    value: "",
+    search: "",
+    ApiResponse: [],
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    const { updateStateApp, resetState } = this.props;
+    const { ApiResponse } = this.state;
+    if (prevState.value !== this.state.value) resetState();
+    if (prevProps.page !== this.props.page) this.getImg();
+    if (prevState.ApiResponse !== this.state.ApiResponse)
+      updateStateApp(ApiResponse);
+  }
 
   handleChangeInput = (e) => {
-    // e.preventDefault();
     this.setState({ value: e.target.value });
   };
 
-  handleSubmit = async (e) => {
+  handleSubmit = (e) => {
     e.preventDefault();
+    this.getImg();
+  };
 
+  getImg = () => {
     const { value } = this.state;
-    const { setSearch, getImg } = this.props;
-
-    await setSearch(value);
-    getImg();
+    const { isLoading, page } = this.props;
+    isLoading(true);
+    imageApi
+      .feachImgQuery(value, page)
+      .then((response) => {
+        this.setState({ ApiResponse: [...response] });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        isLoading(false);
+      });
   };
 
   render() {

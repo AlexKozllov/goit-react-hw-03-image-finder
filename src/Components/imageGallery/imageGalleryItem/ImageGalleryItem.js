@@ -1,7 +1,7 @@
 import React from "react";
 
 const ImageGalleryItem = ({ ApiResponse }) => {
-  console.log(ApiResponse);
+  // console.log(ApiResponse);
   return ApiResponse.map((item) => {
     // console.log(item.webformatURL);
     return (
