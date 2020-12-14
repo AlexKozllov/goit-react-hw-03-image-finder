@@ -1,10 +1,7 @@
 import React from "react";
-import keydown from "react-keydown";
 
 const ImageGalleryItem = ({ ApiResponse, openModal }) => {
-  // console.log(ApiResponse);
   return ApiResponse.map((item) => {
-    // console.log(item.webformatURL);
     return (
       <li key={item.id} className="ImageGalleryItem">
         <img

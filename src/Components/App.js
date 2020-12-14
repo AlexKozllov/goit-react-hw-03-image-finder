@@ -14,22 +14,25 @@ class App extends Component {
     ApiResponse: [],
     page: 1,
     loading: false,
-    // isOpenModal: false,
-    // modalUrl: "",
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const { search, page, ApiResponse } = this.state;
-    if (prevState.search !== search) {
+    const { search, page } = this.state;
+    if (prevState.search !== search) this.resetState();
+
+    if (prevState.search !== search && prevState.page === 1) {
       this.getImg();
-      return;
-    }
-    if (prevState.search !== search && ApiResponse.length !== 0) {
-      this.resetState();
       return;
     }
     if (prevState.page !== page) this.getImg();
   }
+
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    const { page } = this.state;
+    if (page > 1) this.scrollingToEnd();
+    return null;
+  }
+
   updateSearchValue = (value) => {
     this.setState({ search: value });
   };
@@ -46,7 +49,7 @@ class App extends Component {
         }));
       })
       .catch((error) => {
-        console.log(error);
+        console.log("error");
       })
       .finally(() => {
         this.isLoading(false);
@@ -61,8 +64,15 @@ class App extends Component {
     this.setState((prevState) => ({ page: prevState.page + 1 }));
   };
 
-  resetState = async () => {
+  resetState = () => {
     this.setState({ page: 1, ApiResponse: [] });
+  };
+
+  scrollingToEnd = () => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
   };
 
   render() {
@@ -72,7 +82,6 @@ class App extends Component {
       <div>
         <Searchbar updateSearchValue={this.updateSearchValue} />
         {loading && <Spiner />}
-
         {ApiResponse.length !== 0 && <ImageGallery ApiResponse={ApiResponse} />}
         {ApiResponse.length > 0 && (
           <BtnLoadMore handleLoadMore={this.handleLoadMore} />
